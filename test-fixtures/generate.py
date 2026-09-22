@@ -49,10 +49,11 @@ PAGES: list[tuple[str, str]] = [
         "mixed-fa-en",
         """
         <h1>Docflow Test Document</h1>
-        <p>This paragraph is written in English and should stay left-to-right.</p>
+        <p>This paragraph is written in English and should stay on the left.</p>
         <p>این پاراگراف به زبان فارسی است و باید راست‌چین بماند.</p>
         <p>نام پروژه Docflow است و با زبان Python نوشته شده است.</p>
         <p>The version is 1.0 and the release date is 2026.</p>
+        <p>Docflow keeps every block in its own reading direction.</p>
         <h2>فهرست موارد</h2>
         <ol>
           <li>نصب برنامه install</li>
