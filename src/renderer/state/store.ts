@@ -63,6 +63,10 @@ interface DocflowState {
 
   // --- Documents ---
   setActiveDocument: (id: string | null) => void
+  /** Called as the user types; marks the document dirty. */
+  updateDocumentContent: (id: string, content: string) => void
+  /** Called after a successful write, to clear the dirty flag. */
+  markDocumentSaved: (id: string, path: string) => void
 
   // --- Recent files ---
   setRecentFiles: (files: RecentFile[]) => void
@@ -133,6 +137,20 @@ export const useStore = create<DocflowState>((set, get) => ({
   dismissImport: () => set({ activeImport: null }),
 
   setActiveDocument: (id) => set({ activeDocumentId: id }),
+
+  updateDocumentContent: (id, content) =>
+    set((state) => ({
+      documents: state.documents.map((doc) =>
+        doc.id === id ? { ...doc, content, dirty: true } : doc
+      )
+    })),
+
+  markDocumentSaved: (id, path) =>
+    set((state) => ({
+      documents: state.documents.map((doc) =>
+        doc.id === id ? { ...doc, path, dirty: false } : doc
+      )
+    })),
 
   setRecentFiles: (files) => set({ recentFiles: files })
 }))

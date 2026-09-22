@@ -20,6 +20,10 @@ extraResources:
     filter:
       - '**/*'
       - '!.gitkeep'
+  # Vazirmatn is embedded in the renderer bundle, and the SIL Open Font Licence
+  # requires its text to travel with it.
+  - from: src/renderer/assets/fonts/OFL.txt
+    to: licenses/Vazirmatn-OFL.txt
 
 win:
   target:

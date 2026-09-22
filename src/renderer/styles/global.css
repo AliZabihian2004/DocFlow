@@ -1,6 +1,23 @@
 @import 'tailwindcss';
 
 /*
+ * Vazirmatn ships matched Latin and Persian letterforms in one family, so both
+ * scripts share a single face rather than being paired by hand. Mismatched
+ * pairing is the usual reason multilingual interfaces look broken, and letting
+ * Persian fall through to a system default is the usual cause.
+ *
+ * This is the variable font: one 111 KB file covering weights 100-900, bundled
+ * locally because the app must work with no network at all.
+ */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../assets/fonts/Vazirmatn-Variable.woff2') format('woff2-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+}
+
+/*
  * Dark mode is driven by a `dark` class on <html>, not by a media query, so the
  * user's in-app theme preference can override the OS setting.
  */
@@ -101,6 +118,7 @@
     background-color: var(--background);
     color: var(--foreground);
     font-family:
+      'Vazirmatn',
       system-ui,
       -apple-system,
       'Segoe UI',
@@ -114,5 +132,147 @@
   /* The app chrome must never be selectable-draggable like a web page. */
   body {
     user-select: none;
+  }
+
+  /*
+   * Arabic-script letterforms carry ascenders, descenders and diacritics that
+   * collide at the line spacing Latin text is comfortable with, so RTL content
+   * gets more room.
+   *
+   * `:dir()` matches the *resolved* direction, which is what makes this work
+   * with `dir="auto"`: a block only picks up the looser spacing when its own
+   * content actually turns out to be RTL. An `[dir="rtl"]` attribute selector
+   * would miss every auto-detected block.
+   */
+  :dir(ltr) {
+    line-height: 1.65;
+  }
+
+  :dir(rtl) {
+    line-height: 1.9;
+  }
+}
+
+/*
+ * Editor canvas typography.
+ *
+ * Every inline-axis property here is logical - `margin-inline-start`,
+ * `padding-inline-start`, `border-inline-start`, `text-align: start` - rather
+ * than left/right. Each block in a Docflow document decides its own direction
+ * from its own content, so a physical `padding-left` on a list would indent
+ * Persian list items on the wrong side of the page while English ones nearby
+ * looked fine.
+ */
+@layer components {
+  .docflow-prose {
+    color: var(--foreground);
+    text-align: start;
+    /* The document is the one part of the app the user may select freely. */
+    user-select: text;
+    min-height: 60vh;
+  }
+
+  .docflow-prose > * + * {
+    margin-block-start: 1em;
+  }
+
+  .docflow-prose h1,
+  .docflow-prose h2,
+  .docflow-prose h3,
+  .docflow-prose h4 {
+    font-weight: 600;
+    line-height: 1.3;
+    margin-block-start: 1.6em;
+    margin-block-end: 0.5em;
+  }
+
+  .docflow-prose h1 {
+    font-size: 1.85em;
+  }
+  .docflow-prose h2 {
+    font-size: 1.45em;
+  }
+  .docflow-prose h3 {
+    font-size: 1.2em;
+  }
+
+  .docflow-prose ul,
+  .docflow-prose ol {
+    padding-inline-start: 1.6em;
+  }
+
+  .docflow-prose ul {
+    list-style: disc;
+  }
+  .docflow-prose ol {
+    list-style: decimal;
+  }
+
+  .docflow-prose li {
+    margin-block: 0.25em;
+  }
+
+  .docflow-prose blockquote {
+    border-inline-start: 3px solid var(--border);
+    padding-inline-start: 1em;
+    color: var(--muted-foreground);
+    font-style: italic;
+  }
+
+  .docflow-prose code {
+    background-color: var(--muted);
+    border-radius: var(--radius-sm);
+    padding-inline: 0.35em;
+    padding-block: 0.15em;
+    font-size: 0.9em;
+    /* Code is never RTL, whatever surrounds it. */
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+
+  .docflow-prose pre {
+    background-color: var(--muted);
+    border-radius: var(--radius-md);
+    padding: 0.9em 1.1em;
+    overflow-x: auto;
+    direction: ltr;
+    text-align: start;
+  }
+
+  .docflow-prose pre code {
+    background: none;
+    padding: 0;
+  }
+
+  .docflow-prose a {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+
+  .docflow-prose hr {
+    border: none;
+    border-block-start: 1px solid var(--border);
+  }
+
+  .docflow-prose table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .docflow-prose th,
+  .docflow-prose td {
+    border: 1px solid var(--border);
+    padding: 0.4em 0.7em;
+    text-align: start;
+  }
+
+  .docflow-prose th {
+    background-color: var(--muted);
+    font-weight: 600;
+  }
+
+  /* ProseMirror shows this on an empty document. */
+  .docflow-prose .ProseMirror-trailingBreak {
+    pointer-events: none;
   }
 }
