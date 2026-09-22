@@ -7,6 +7,7 @@ import { listener, listenerCtx } from '@milkdown/kit/plugin/listener'
 import { clipboard } from '@milkdown/kit/plugin/clipboard'
 import { cursor } from '@milkdown/kit/plugin/cursor'
 import { trailing } from '@milkdown/kit/plugin/trailing'
+import { rtlPlugin } from './rtl-plugin'
 import { Milkdown, useEditor } from '@milkdown/react'
 import '@milkdown/kit/prose/view/style/prosemirror.css'
 import '@milkdown/kit/prose/tables/style/tables.css'
@@ -43,11 +44,11 @@ export function MarkdownCanvas({
           ctx.update(editorViewOptionsCtx, (previous) => ({
             ...previous,
             attributes: {
-              class: 'docflow-prose outline-none',
-              // Direction is inferred per block from the block's own content,
-              // which is what lets one document mix Persian and English
-              // paragraphs. The editor shell itself stays LTR.
-              dir: 'auto'
+              class: 'docflow-prose outline-none'
+              // No `dir` here on purpose. `dir="auto"` on the root resolves
+              // from the first strong character in the entire document, so one
+              // English heading would force every Persian paragraph below it
+              // left-to-right. rtl-plugin assigns direction per block instead.
             }
           }))
 
@@ -66,7 +67,9 @@ export function MarkdownCanvas({
         .use(cursor)
         // Guarantees a trailing paragraph, so there is always somewhere to
         // click below a table or code block at the end of a document.
-        .use(trailing),
+        .use(trailing)
+        // Assigns `dir` to each block from its own content.
+        .use(rtlPlugin),
     // Deliberately keyed on the document, not the content: a new editor per
     // keystroke would be catastrophic.
     [documentId]
