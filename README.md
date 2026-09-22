@@ -68,6 +68,8 @@ paragraph sits next to an English one and a single sentence contains both.
 
 ## Installing Docflow
 
+برای راهنمای نصب فارسی، [راهنمای فارسی نصب](docs/INSTALL.fa.md) را ببینید.
+
 Download the build for your system from the
 [Releases page](https://github.com/AliZabihian2004/DocFlow/releases).
 
