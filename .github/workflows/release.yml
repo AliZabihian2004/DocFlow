@@ -18,17 +18,20 @@ jobs:
         include:
           - os: windows-latest
             script: build:win
+            sidecar: build-scripts/build-sidecar-win.sh
             artifact: windows
             files: |
               release/*.exe
               release/*.blockmap
           - os: macos-latest
             script: build:mac
+            sidecar: build-scripts/build-sidecar-mac.sh
             artifact: macos
             files: |
               release/*.dmg
           - os: ubuntu-latest
             script: build:linux
+            sidecar: build-scripts/build-sidecar-linux.sh
             artifact: linux
             files: |
               release/*.AppImage
@@ -44,8 +47,17 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Build Python sidecar
+        shell: bash
+        run: bash ${{ matrix.sidecar }}
 
       - name: Build installer
         run: npm run ${{ matrix.script }}
