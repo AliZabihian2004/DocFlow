@@ -1,12 +1,14 @@
 import { app, ipcMain } from 'electron'
+import { registerFileHandlers } from './file-handlers'
+import { registerPdfHandlers } from './pdf-handlers'
 import type { HostInfo } from '@shared/types'
 
 /**
  * Registers every IPC handler the app exposes.
  *
  * Called once, after `app.whenReady()`. Handlers are grouped by domain into
- * sibling modules (pdf-handlers, file-handlers) and wired up from here, so
- * there is exactly one place to look for the full list of IPC channels.
+ * sibling modules and wired up from here, so there is exactly one place to
+ * look for the full list of IPC channels.
  */
 export function registerIpcHandlers(): void {
   ipcMain.handle(
@@ -17,4 +19,7 @@ export function registerIpcHandlers(): void {
       electronVersion: process.versions.electron
     })
   )
+
+  registerPdfHandlers()
+  registerFileHandlers()
 }

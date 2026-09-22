@@ -16,7 +16,9 @@
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "npm run build && electron-builder --mac",
-    "build:linux": "npm run build && electron-builder --linux"
+    "build:linux": "npm run build && electron-builder --linux",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "zustand": "5.0.15"
@@ -34,6 +36,7 @@
     "react-dom": "19.3.0",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
-    "vite": "7.3.6"
+    "vite": "7.3.6",
+    "vitest": "^5.0.1"
   }
 }

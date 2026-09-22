@@ -2,6 +2,7 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
 import { loadWindowState, trackWindowState } from './window-state'
 import { registerIpcHandlers } from './ipc'
+import { sidecar } from './python-bridge/sidecar'
 
 /**
  * Main process entry point.
@@ -79,12 +80,22 @@ if (!app.requestSingleInstanceLock()) {
 
   void app.whenReady().then(() => {
     registerIpcHandlers()
+
+    // Start the parser up front. Loading PyMuPDF takes a second or two, and
+    // paying that at launch means the first import feels instant.
+    sidecar.start()
+
     createWindow()
 
     // macOS convention: clicking the dock icon with no windows open reopens one.
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
     })
+  })
+
+  // Kill the sidecar before we go, or it outlives the app as an orphan.
+  app.on('will-quit', () => {
+    sidecar.dispose()
   })
 
   app.on('window-all-closed', () => {
