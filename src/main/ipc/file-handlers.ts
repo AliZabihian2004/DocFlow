@@ -1,6 +1,8 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
 import { extname } from 'node:path'
+import { addRecentFile, clearRecentFiles, loadRecentFiles } from '../recent-files'
+import type { RecentFile } from '@shared/types'
 
 /**
  * IPC handlers for filesystem access.
@@ -15,7 +17,10 @@ export const FILE_CHANNELS = {
   openPdfDialog: 'file:open-pdf-dialog',
   readMarkdown: 'file:read-markdown',
   writeMarkdown: 'file:write-markdown',
-  saveMarkdownDialog: 'file:save-markdown-dialog'
+  saveMarkdownDialog: 'file:save-markdown-dialog',
+  getRecent: 'file:get-recent',
+  addRecent: 'file:add-recent',
+  clearRecent: 'file:clear-recent'
 } as const
 
 const MARKDOWN_EXTENSIONS = new Set(['.md', '.markdown'])
@@ -74,4 +79,14 @@ export function registerFileHandlers(): void {
       return result.canceled || !result.filePath ? null : result.filePath
     }
   )
+
+  ipcMain.handle(FILE_CHANNELS.getRecent, (): RecentFile[] => loadRecentFiles())
+
+  ipcMain.handle(
+    FILE_CHANNELS.addRecent,
+    (_event, path: string, kind: RecentFile['kind']): RecentFile[] =>
+      addRecentFile(path, kind)
+  )
+
+  ipcMain.handle(FILE_CHANNELS.clearRecent, (): RecentFile[] => clearRecentFiles())
 }

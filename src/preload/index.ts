@@ -1,10 +1,11 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import type {
   DocflowApi,
   OcrInfo,
   ParsePdfRequest,
   ParseProgress,
-  ParseResult
+  ParseResult,
+  RecentFile
 } from '@shared/types'
 
 /**
@@ -48,7 +49,19 @@ const api: DocflowApi = {
     ipcRenderer.invoke('file:write-markdown', path, content),
 
   saveMarkdownDialog: (suggestedName: string): Promise<string | null> =>
-    ipcRenderer.invoke('file:save-markdown-dialog', suggestedName)
+    ipcRenderer.invoke('file:save-markdown-dialog', suggestedName),
+
+  getRecentFiles: (): Promise<RecentFile[]> => ipcRenderer.invoke('file:get-recent'),
+
+  addRecentFile: (path: string, kind: RecentFile['kind']): Promise<RecentFile[]> =>
+    ipcRenderer.invoke('file:add-recent', path, kind),
+
+  clearRecentFiles: (): Promise<RecentFile[]> => ipcRenderer.invoke('file:clear-recent'),
+
+  // Runs here rather than in the renderer because webUtils is a main-world
+  // Electron API. The File object survives the contextBridge boundary intact,
+  // which is what makes this the supported replacement for File.path.
+  getPathForFile: (file: File): string => webUtils.getPathForFile(file)
 }
 
 contextBridge.exposeInMainWorld('api', api)

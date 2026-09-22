@@ -99,6 +99,16 @@ export interface MarkdownDocument {
   content: string
 }
 
+/** An entry in the welcome screen's recent list. */
+export interface RecentFile {
+  path: string
+  /** Basename, precomputed so the renderer never has to parse a path. */
+  name: string
+  kind: 'pdf' | 'markdown'
+  /** ISO timestamp of the most recent open. */
+  openedAt: string
+}
+
 // --- The renderer's whole view of the outside world ------------------------
 
 /**
@@ -129,4 +139,18 @@ export interface DocflowApi {
   writeMarkdown: (path: string, content: string) => Promise<void>
   /** Show a save dialog. Returns null if the user cancelled. */
   saveMarkdownDialog: (suggestedName: string) => Promise<string | null>
+
+  getRecentFiles: () => Promise<RecentFile[]>
+  /** Records an open and returns the updated list. */
+  addRecentFile: (path: string, kind: RecentFile['kind']) => Promise<RecentFile[]>
+  clearRecentFiles: () => Promise<RecentFile[]>
+
+  /**
+   * Resolve the absolute path of a dropped File.
+   *
+   * Electron removed the non-standard `File.path` property, so a drag-and-drop
+   * handler in the renderer cannot learn where the file actually is. This is
+   * the supported replacement and it must run in the preload context.
+   */
+  getPathForFile: (file: File) => string
 }
