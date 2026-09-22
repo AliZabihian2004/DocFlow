@@ -1,0 +1,47 @@
+appId: dev.docflow.app
+productName: Docflow
+copyright: Copyright © 2026 Ali Zabihian
+
+directories:
+  buildResources: resources
+  output: release
+
+# Only the compiled bundles ship; source and configs stay out of the package.
+files:
+  - out/**/*
+  - package.json
+
+# The PyInstaller-compiled Python sidecar is not a node module, so it is copied
+# in verbatim alongside the app rather than bundled into the asar archive.
+# At runtime it resolves to <app>/resources/python-dist/ — see src/main/python-bridge/sidecar.ts.
+extraResources:
+  - from: resources/python-dist
+    to: python-dist
+    filter:
+      - '**/*'
+      - '!.gitkeep'
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: resources/icons/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+
+mac:
+  target:
+    - target: dmg
+      arch: [x64, arm64]
+  icon: resources/icons/icon.icns
+  category: public.app-category.productivity
+
+linux:
+  target:
+    - AppImage
+    - deb
+  icon: resources/icons
+  category: Office

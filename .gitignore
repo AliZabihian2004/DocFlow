@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+out/
+dist/
+release/
+
+# Compiled Python sidecar (built per-platform by build-scripts/, never committed)
+resources/python-dist/*
+!resources/python-dist/.gitkeep
+python-sidecar/build/
+python-sidecar/dist/
+python-sidecar/*.spec
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated test fixtures (the synthetic ones; real PDFs are committed)
+test-fixtures/generated/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript incremental build info
+*.tsbuildinfo
+.pytest_cache/
