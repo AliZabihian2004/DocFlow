@@ -1,5 +1,9 @@
 # Docflow
 
+<p align="center">
+  <img src="docs/repo-card.png" alt="Docflow - offline PDF to clean Markdown with Persian and RTL support" width="100%" />
+</p>
+
 **Convert PDFs into clean, editable markdown — entirely offline, with Persian and
 other right-to-left languages treated as a first-class case rather than an
 afterthought.**

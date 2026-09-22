@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1280" height="640" viewBox="0 0 1280 640" role="img" aria-labelledby="title description">
+  <title id="title">Docflow - Offline PDF to Markdown</title>
+  <desc id="description">An offline PDF to Markdown desktop app with Persian and right-to-left language support.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5eb1f5"/>
+      <stop offset="0.52" stop-color="#2174e5"/>
+      <stop offset="1" stop-color="#1049c7"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#082e86" flood-opacity="0.3"/>
+    </filter>
+    <clipPath id="logoClip">
+      <rect x="112" y="108" width="424" height="424" rx="88"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1280" height="640" rx="44" fill="url(#background)"/>
+  <circle cx="1120" cy="80" r="230" fill="#ffffff" opacity="0.07"/>
+  <circle cx="80" cy="610" r="220" fill="#062fa8" opacity="0.14"/>
+
+  <g filter="url(#shadow)">
+    <rect x="112" y="108" width="424" height="424" rx="88" fill="#ffffff"/>
+    <image x="112" y="108" width="424" height="424" preserveAspectRatio="xMidYMid slice" clip-path="url(#logoClip)" xlink:href="../resources/icon.png"/>
+  </g>
+
+  <g fill="#ffffff" font-family="Segoe UI, Arial, sans-serif">
+    <text x="630" y="260" font-size="88" font-weight="700">Docflow</text>
+    <text x="635" y="332" font-size="30" opacity="0.94">Offline PDF to clean Markdown</text>
+    <text x="635" y="386" font-size="27" opacity="0.9">Persian and RTL support built in</text>
+  </g>
+
+  <g fill="#ffffff" opacity="0.9" font-family="Segoe UI, Arial, sans-serif" font-size="20">
+    <text x="638" y="482">OCR</text>
+    <text x="718" y="482">WYSIWYG editor</text>
+    <text x="930" y="482">Fully offline</text>
+  </g>
+  <g fill="#ffffff" opacity="0.7">
+    <circle cx="620" cy="475" r="5"/>
+    <circle cx="700" cy="475" r="5"/>
+    <circle cx="912" cy="475" r="5"/>
+  </g>
+</svg>
