@@ -33,8 +33,17 @@ export function usePdfParser(): {
 
       beginImport(requestId, path, fileName)
 
+      // Settings may not have loaded yet on a very early import; omitting them
+      // lets the sidecar fall back to its own defaults.
+      const settings = useStore.getState().settings
+
       try {
-        const result = await window.api.parsePdf({ requestId, path })
+        const result = await window.api.parsePdf({
+          requestId,
+          path,
+          ocrLanguages: settings?.ocrLanguages,
+          tesseractPath: settings?.tesseractPath ?? undefined
+        })
         completeImport(result)
 
         // Only record files that actually parsed. A recent list full of

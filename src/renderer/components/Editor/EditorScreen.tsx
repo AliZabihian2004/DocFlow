@@ -9,12 +9,13 @@ import { useStore, type DocflowDocument } from '@renderer/state/store'
 /**
  * The editing screen: toolbar, canvas, status bar.
  *
- * The three-pane layout (file sidebar, canvas, inspector) lands in a later
- * phase; this is the centre column it will sit inside.
+ * This is the centre column of the workspace; the file sidebar and inspector
+ * are siblings mounted by App, not children of this component.
  */
 export function EditorScreen({ document: doc }: { document: DocflowDocument }): React.JSX.Element {
   const updateDocumentContent = useStore((state) => state.updateDocumentContent)
-  const setActiveDocument = useStore((state) => state.setActiveDocument)
+  const toggleInspector = useStore((state) => state.toggleInspector)
+  const inspectorOpen = useStore((state) => state.inspectorOpen)
   const { saveDocument } = useFileSystem()
 
   const handleChange = useCallback(
@@ -49,8 +50,13 @@ export function EditorScreen({ document: doc }: { document: DocflowDocument }): 
             {doc.title}
           </h1>
           <div className="flex shrink-0 items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setActiveDocument(null)}>
-              Close
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-pressed={inspectorOpen}
+              onClick={toggleInspector}
+            >
+              Inspector
             </Button>
             <Button size="sm" onClick={handleSave} disabled={!doc.dirty}>
               Save

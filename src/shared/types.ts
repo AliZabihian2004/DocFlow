@@ -109,6 +109,29 @@ export interface RecentFile {
   openedAt: string
 }
 
+// --- Settings --------------------------------------------------------------
+
+export type ThemePreference = 'system' | 'light' | 'dark'
+
+/**
+ * User preferences, persisted in userData.
+ *
+ * Deliberately small. Every entry here is something a user genuinely cannot
+ * work around otherwise - an OCR engine in a non-standard place, a font size
+ * their eyes need, a theme their OS reports wrongly.
+ */
+export interface Settings {
+  /** Tesseract language packs to load, e.g. "fas+eng". */
+  ocrLanguages: string
+  /** Explicit Tesseract binary path, or null to auto-detect. */
+  tesseractPath: string | null
+  /** Editor canvas font size in pixels. */
+  editorFontSize: number
+  theme: ThemePreference
+  /** Directory the save dialog opens in, or null for the OS default. */
+  defaultSaveDirectory: string | null
+}
+
 // --- The renderer's whole view of the outside world ------------------------
 
 /**
@@ -153,4 +176,10 @@ export interface DocflowApi {
    * the supported replacement and it must run in the preload context.
    */
   getPathForFile: (file: File) => string
+
+  getSettings: () => Promise<Settings>
+  /** Merge a partial update and return the full saved settings. */
+  updateSettings: (changes: Partial<Settings>) => Promise<Settings>
+  /** Native directory picker, for the default save location. */
+  chooseDirectory: () => Promise<string | null>
 }

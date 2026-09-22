@@ -3,7 +3,8 @@ import type {
   ExtractionPath,
   ParseProgress,
   ParseResult,
-  RecentFile
+  RecentFile,
+  Settings
 } from '@shared/types'
 
 /**
@@ -52,6 +53,15 @@ interface DocflowState {
   activeDocumentId: string | null
   activeImport: ImportState | null
   recentFiles: RecentFile[]
+  settings: Settings | null
+
+  // --- Interface state ---
+  /** Sidebar starts open; the inspector does not - it is not a fixture. */
+  sidebarCollapsed: boolean
+  inspectorOpen: boolean
+  settingsOpen: boolean
+  /** Filter text for the sidebar's file list. */
+  fileFilter: string
 
   // --- Import lifecycle ---
   beginImport: (requestId: string, sourcePath: string, fileName: string) => void
@@ -67,6 +77,18 @@ interface DocflowState {
   updateDocumentContent: (id: string, content: string) => void
   /** Called after a successful write, to clear the dirty flag. */
   markDocumentSaved: (id: string, path: string) => void
+  /** Start a blank document. Returns its id. */
+  createDocument: () => string
+  closeDocument: (id: string) => void
+
+  // --- Interface state ---
+  toggleSidebar: () => void
+  toggleInspector: () => void
+  setSettingsOpen: (open: boolean) => void
+  setFileFilter: (filter: string) => void
+
+  // --- Settings ---
+  setSettings: (settings: Settings) => void
 
   // --- Recent files ---
   setRecentFiles: (files: RecentFile[]) => void
@@ -83,6 +105,12 @@ export const useStore = create<DocflowState>((set, get) => ({
   activeDocumentId: null,
   activeImport: null,
   recentFiles: [],
+  settings: null,
+
+  sidebarCollapsed: false,
+  inspectorOpen: false,
+  settingsOpen: false,
+  fileFilter: '',
 
   beginImport: (requestId, sourcePath, fileName) =>
     set({
@@ -152,8 +180,65 @@ export const useStore = create<DocflowState>((set, get) => ({
       )
     })),
 
+  createDocument: () => {
+    const id = crypto.randomUUID()
+
+    set((state) => ({
+      documents: [
+        ...state.documents,
+        {
+          id,
+          title: nextUntitledName(state.documents),
+          path: null,
+          content: '',
+          origin: 'new',
+          hasRtl: false,
+          wordsReversed: 0,
+          // Empty and unsaved, but nothing has been written yet, so there is
+          // no work at risk until the user types.
+          dirty: false
+        }
+      ],
+      activeDocumentId: id
+    }))
+
+    return id
+  },
+
+  closeDocument: (id) =>
+    set((state) => {
+      const documents = state.documents.filter((doc) => doc.id !== id)
+      return {
+        documents,
+        activeDocumentId:
+          state.activeDocumentId === id
+            ? (documents[documents.length - 1]?.id ?? null)
+            : state.activeDocumentId
+      }
+    }),
+
+  toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
+
+  toggleInspector: () => set((state) => ({ inspectorOpen: !state.inspectorOpen })),
+
+  setSettingsOpen: (open) => set({ settingsOpen: open }),
+
+  setFileFilter: (filter) => set({ fileFilter: filter }),
+
+  setSettings: (settings) => set({ settings }),
+
   setRecentFiles: (files) => set({ recentFiles: files })
 }))
+
+/** "Untitled", then "Untitled 2", and so on. */
+function nextUntitledName(documents: DocflowDocument[]): string {
+  const taken = new Set(documents.map((doc) => doc.title))
+  if (!taken.has('Untitled')) return 'Untitled'
+
+  let index = 2
+  while (taken.has(`Untitled ${index}`)) index += 1
+  return `Untitled ${index}`
+}
 
 /** The document currently shown in the editor, if any. */
 export function useActiveDocument(): DocflowDocument | null {

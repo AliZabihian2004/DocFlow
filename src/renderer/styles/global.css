@@ -53,6 +53,10 @@
   --destructive-foreground: oklch(0.99 0 0);
 
   --radius: 0.5rem;
+
+  /* Overwritten at runtime from the user's setting; this is the fallback for
+     the moment before settings have loaded. */
+  --editor-font-size: 16px;
 }
 
 .dark {
@@ -166,6 +170,7 @@
 @layer components {
   .docflow-prose {
     color: var(--foreground);
+    font-size: var(--editor-font-size);
     text-align: start;
     /* The document is the one part of the app the user may select freely. */
     user-select: text;

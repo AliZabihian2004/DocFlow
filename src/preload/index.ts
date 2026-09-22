@@ -5,7 +5,8 @@ import type {
   ParsePdfRequest,
   ParseProgress,
   ParseResult,
-  RecentFile
+  RecentFile,
+  Settings
 } from '@shared/types'
 
 /**
@@ -61,7 +62,14 @@ const api: DocflowApi = {
   // Runs here rather than in the renderer because webUtils is a main-world
   // Electron API. The File object survives the contextBridge boundary intact,
   // which is what makes this the supported replacement for File.path.
-  getPathForFile: (file: File): string => webUtils.getPathForFile(file)
+  getPathForFile: (file: File): string => webUtils.getPathForFile(file),
+
+  getSettings: (): Promise<Settings> => ipcRenderer.invoke('settings:get'),
+
+  updateSettings: (changes: Partial<Settings>): Promise<Settings> =>
+    ipcRenderer.invoke('settings:update', changes),
+
+  chooseDirectory: (): Promise<string | null> => ipcRenderer.invoke('file:choose-directory')
 }
 
 contextBridge.exposeInMainWorld('api', api)

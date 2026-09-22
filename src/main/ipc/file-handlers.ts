@@ -1,8 +1,9 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron'
 import { readFile, writeFile } from 'node:fs/promises'
-import { extname } from 'node:path'
+import { extname, join } from 'node:path'
 import { addRecentFile, clearRecentFiles, loadRecentFiles } from '../recent-files'
-import type { RecentFile } from '@shared/types'
+import { loadSettings, updateSettings } from '../settings'
+import type { RecentFile, Settings } from '@shared/types'
 
 /**
  * IPC handlers for filesystem access.
@@ -20,7 +21,10 @@ export const FILE_CHANNELS = {
   saveMarkdownDialog: 'file:save-markdown-dialog',
   getRecent: 'file:get-recent',
   addRecent: 'file:add-recent',
-  clearRecent: 'file:clear-recent'
+  clearRecent: 'file:clear-recent',
+  chooseDirectory: 'file:choose-directory',
+  getSettings: 'settings:get',
+  updateSettings: 'settings:update'
 } as const
 
 const MARKDOWN_EXTENSIONS = new Set(['.md', '.markdown'])
@@ -66,9 +70,14 @@ export function registerFileHandlers(): void {
     FILE_CHANNELS.saveMarkdownDialog,
     async (event, suggestedName: string): Promise<string | null> => {
       const window = BrowserWindow.fromWebContents(event.sender)
+      const { defaultSaveDirectory } = loadSettings()
       const options: Electron.SaveDialogOptions = {
         title: 'Save markdown',
-        defaultPath: suggestedName,
+        // Honour the configured save location, falling back to the OS default
+        // by passing just the file name.
+        defaultPath: defaultSaveDirectory
+          ? join(defaultSaveDirectory, suggestedName)
+          : suggestedName,
         filters: [{ name: 'Markdown', extensions: ['md'] }]
       }
 
@@ -89,4 +98,25 @@ export function registerFileHandlers(): void {
   )
 
   ipcMain.handle(FILE_CHANNELS.clearRecent, (): RecentFile[] => clearRecentFiles())
+
+  ipcMain.handle(FILE_CHANNELS.chooseDirectory, async (event): Promise<string | null> => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    const options: Electron.OpenDialogOptions = {
+      title: 'Choose a default save location',
+      properties: ['openDirectory', 'createDirectory']
+    }
+
+    const result = window
+      ? await dialog.showOpenDialog(window, options)
+      : await dialog.showOpenDialog(options)
+
+    return result.canceled || result.filePaths.length === 0 ? null : result.filePaths[0]
+  })
+
+  ipcMain.handle(FILE_CHANNELS.getSettings, (): Settings => loadSettings())
+
+  ipcMain.handle(
+    FILE_CHANNELS.updateSettings,
+    (_event, changes: Partial<Settings>): Settings => updateSettings(changes)
+  )
 }
