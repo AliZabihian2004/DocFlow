@@ -29,23 +29,30 @@ win:
   target:
     - target: nsis
       arch: [x64]
-  icon: resources/icons/icon.ico
+  icon: resources/icon.png
+  # No `portable` target on purpose. It was built and measured: a portable
+  # build unpacks the whole app into %TEMP% on every launch, and at ~600 MB
+  # unpacked that took 102 seconds before the window appeared - every time, not
+  # just the first. Users would reasonably conclude the app was broken.
+  # If the bundle ever slims down enough, revisit it.
 
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
+  # Leave the user's documents alone when they uninstall.
+  deleteAppDataOnUninstall: false
 
 mac:
   target:
     - target: dmg
       arch: [x64, arm64]
-  icon: resources/icons/icon.icns
+  icon: resources/icon.png
   category: public.app-category.productivity
 
 linux:
   target:
     - AppImage
     - deb
-  icon: resources/icons
+  icon: resources/icon.png
   category: Office

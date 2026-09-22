@@ -56,8 +56,20 @@ export class SidecarError extends Error {
  */
 export function getSidecarPath(): { command: string; args: string[]; cwd?: string } {
   if (app.isPackaged) {
-    const binaryName = process.platform === 'win32' ? 'docflow-sidecar.exe' : 'docflow-sidecar'
-    return { command: join(process.resourcesPath, 'python-dist', binaryName), args: [] }
+    // The folder PyInstaller creates is named without the extension; only the
+    // executable inside it carries one.
+    const folderName = 'docflow-sidecar'
+    const binaryName = process.platform === 'win32' ? `${folderName}.exe` : folderName
+    const distRoot = join(process.resourcesPath, 'python-dist')
+
+    // Both PyInstaller layouts are accepted, so switching between them is a
+    // build decision rather than a code change:
+    //   --onedir   python-dist/docflow-sidecar/docflow-sidecar.exe
+    //   --onefile  python-dist/docflow-sidecar.exe
+    const candidates = [join(distRoot, folderName, binaryName), join(distRoot, binaryName)]
+    const found = candidates.find((candidate) => existsSync(candidate))
+
+    return { command: found ?? candidates[0], args: [] }
   }
 
   // Development: run from source, out of the project virtualenv when present.
@@ -124,6 +136,10 @@ export class PythonSidecar {
     const child = spawn(command, args, {
       cwd,
       stdio: ['pipe', 'pipe', 'pipe'],
+      // The sidecar is a console application - it has to be, the protocol is
+      // stdin/stdout - so Windows would flash a console window every launch
+      // without this.
+      windowsHide: true,
       env: {
         ...process.env,
         // Unbuffered, so progress events arrive while a parse is running

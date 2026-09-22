@@ -18,7 +18,8 @@
     "build:mac": "npm run build && electron-builder --mac",
     "build:linux": "npm run build && electron-builder --linux",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:sidecar": "bash build-scripts/build-sidecar-win.sh"
   },
   "dependencies": {
     "@milkdown/kit": "^7.22.1",

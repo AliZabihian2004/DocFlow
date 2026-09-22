@@ -1,0 +1,16 @@
+# Normalise line endings so a checkout on Windows does not break POSIX tooling.
+* text=auto
+
+# Shell scripts must keep LF. CRLF here produces the classic
+# "bad interpreter: /bin/bash^M" failure on macOS and Linux.
+*.sh text eol=lf
+
+# Python keeps LF for the same reason: the sidecar is built on all three OSes.
+*.py text eol=lf
+
+# Binary assets must never be touched.
+*.woff2 binary
+*.pdf binary
+*.png binary
+*.ico binary
+*.icns binary
