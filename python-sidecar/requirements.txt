@@ -1,0 +1,13 @@
+# Runtime dependencies for the Docflow parsing sidecar.
+# Versions are pinned so the PyInstaller build is reproducible across machines.
+
+pymupdf==1.28.2          # PDF parsing, page rasterisation, text-layer detection
+pymupdf4llm==1.28.2      # markdown-aware extraction (headings, lists, tables)
+pytesseract==0.3.13      # thin wrapper over the Tesseract OCR binary
+pillow==12.3.0           # image handling between PyMuPDF and Tesseract
+
+# Deliberately absent: arabic-reshaper and python-bidi. They convert text
+# into *visual* order for renderers that do no shaping of their own. Our
+# output goes to a markdown file and a Chromium editor, both of which want
+# logical order and run the bidi algorithm themselves - applying those
+# libraries here would reverse every Persian run. See parser/rtl_fix.py.

@@ -1,0 +1,5 @@
+# Development-only dependencies: tests and test-fixture generation.
+-r requirements.txt
+
+pytest==9.0.1
+pyinstaller==6.22.3
